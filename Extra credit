@@ -1,0 +1,260 @@
+
+package hw4;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class MusicPlayer {
+
+    private static class Node {
+        Song song;
+        Node prev;
+        Node next;
+
+        Node(Song song) {
+            this.song = song;
+        }
+    }
+
+    private Node head;
+    private Node tail;
+    private Node current;
+    private boolean repeatMode = false;
+
+    private final Map<String, Node> library;
+    private final Deque<Node> upNext;
+    private final Deque<Node> history;
+    private final Map<String, Integer> playCounts;
+
+    public MusicPlayer() {
+        head = null;
+        tail = null;
+        current = null;
+
+        library = new HashMap<>();
+        upNext = new ArrayDeque<>();
+        history = new ArrayDeque<>();
+        playCounts = new HashMap<>();
+    }
+
+    public void setRepeat(boolean repeat) {
+        repeatMode = repeat;
+    }
+
+    public boolean addSong(String id, String title, String artist) {
+        if (library.containsKey(id)) {
+            return false;
+        }
+
+        Song song = new Song(id, title, artist);
+        Node node = new Node(song);
+
+        if (head == null) {
+            head = node;
+            tail = node;
+        } else {
+            tail.next = node;
+            node.prev = tail;
+            tail = node;
+        }
+
+        library.put(id, node);
+        playCounts.put(id, 0);
+
+        return true;
+    }
+
+    public Song findSong(String id) {
+        Node node = library.get(id);
+
+        if (node == null) {
+            return null;
+        }
+
+        return node.song;
+    }
+
+    public List<String> showPlaylist() {
+        List<String> titles = new ArrayList<>();
+
+        for (Node node = head; node != null; node = node.next) {
+            titles.add(node.song.title);
+        }
+
+        return titles;
+    }
+
+    private Song start(Node node) {
+        current = node;
+        playCounts.put(
+            node.song.id,
+            playCounts.getOrDefault(node.song.id, 0) + 1
+        );
+
+        return node.song;
+    }
+
+    public Song play(String id) {
+        Node node = library.get(id);
+
+        if (node == null) {
+            return null;
+        }
+
+        if (current != null) {
+            history.push(current);
+        }
+
+        return start(node);
+    }
+
+    public Song nowPlaying() {
+        if (current == null) {
+            return null;
+        }
+
+        return current.song;
+    }
+
+    public int playCount(String id) {
+        return playCounts.getOrDefault(id, 0);
+    }
+
+    public boolean queueLater(String id) {
+        Node node = library.get(id);
+
+        if (node == null) {
+            return false;
+        }
+
+        upNext.addLast(node);
+        return true;
+    }
+
+    public boolean queueNext(String id) {
+        Node node = library.get(id);
+
+        if (node == null) {
+            return false;
+        }
+
+        upNext.addFirst(node);
+        return true;
+    }
+
+    public List<String> showUpNext() {
+        List<String> titles = new ArrayList<>();
+
+        for (Node node : upNext) {
+            if (library.get(node.song.id) == node) {
+                titles.add(node.song.title);
+            }
+        }
+
+        return titles;
+    }
+
+    public Song next() {
+        Node target = null;
+
+        while (!upNext.isEmpty()) {
+            Node node = upNext.peekFirst();
+
+            if (library.get(node.song.id) == node) {
+                target = upNext.pollFirst();
+                break;
+            }
+
+            upNext.pollFirst();
+        }
+
+        if (target == null) {
+            if (current == null) {
+                return null;
+            }
+
+            target = current.next;
+
+            if (target == null && repeatMode) {
+                target = head;
+            }
+        }
+
+        if (target == null) {
+            return null;
+        }
+
+        if (current != null) {
+            history.push(current);
+        }
+
+        return start(target);
+    }
+
+    public Song back() {
+        Node target = null;
+
+        while (!history.isEmpty()) {
+            Node node = history.pop();
+
+            if (library.get(node.song.id) == node) {
+                target = node;
+                break;
+            }
+        }
+
+        if (target == null) {
+            return null;
+        }
+
+        if (current != null) {
+            upNext.addFirst(current);
+        }
+
+        return start(target);
+    }
+
+    public List<String> showHistory() {
+        List<String> titles = new ArrayList<>();
+
+        for (Node node : history) {
+            if (library.get(node.song.id) == node) {
+                titles.add(node.song.title);
+            }
+        }
+
+        return titles;
+    }
+
+    public boolean removeSong(String id) {
+        Node node = library.get(id);
+
+        if (node == null || node == current) {
+            return false;
+        }
+
+        if (node.prev == null) {
+            head = node.next;
+        } else {
+            node.prev.next = node.next;
+        }
+
+        if (node.next == null) {
+            tail = node.prev;
+        } else {
+            node.next.prev = node.prev;
+        }
+
+        library.remove(id);
+        playCounts.remove(id);
+
+        node.prev = null;
+        node.next = null;
+
+        return true;
+    }
+}
