@@ -1,0 +1,33 @@
+--- Playlist ---
+true
+true
+true
+true
+duplicate a2: false
+playlist: [Solar Flare, Quiet Roads, Pixel Dreams, After Rain]
+find a3: Pixel Dreams
+find a8: null
+play a2: Quiet Roads
+next: Pixel Dreams
+queue next a1: true
+queue later a4: true
+up next: [Solar Flare, After Rain]
+next: Solar Flare
+now playing: Solar Flare
+history: [Pixel Dreams, Quiet Roads]
+back: Pixel Dreams
+now playing: Pixel Dreams
+up next: [Solar Flare, After Rain]
+remove a2: true
+remove current a3: false
+playlist: [Solar Flare, Pixel Dreams, After Rain]
+next: Solar Flare
+next: After Rain
+play counts a1: 2
+play counts a2 (removed): 0
+play counts a4: 1
+play counts a3: 2
+empty next: null
+empty back: null
+empty now playing: null
+empty playlist: []
