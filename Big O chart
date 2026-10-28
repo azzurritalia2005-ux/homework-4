@@ -1,0 +1,25 @@
+## Big-O Time Complexity
+
+| Method | Time Complexity | Explanation |
+|---|---|---|
+| `addSong()` | O(1) average | Adds a song to the end of the doubly linked list and inserts it into the HashMaps. |
+| `findSong()` | O(1) average | Uses a HashMap to find a song by ID. |
+| `showPlaylist()` | O(n) | Traverses the playlist to collect all song titles. |
+| `play()` | O(1) average | Finds the song using a HashMap and updates the current song and history stack. |
+| `nowPlaying()` | O(1) | Returns the current song directly. |
+| `playCount()` | O(1) average | Looks up a song's play count in a HashMap. |
+| `queueLater()` | O(1) average | Adds a song to the end of the deque. |
+| `queueNext()` | O(1) average | Adds a song to the front of the deque. |
+| `showUpNext()` | O(q) | Traverses the up-next deque to collect queued song titles. |
+| `next()` | O(q) worst case | May skip multiple invalid entries in the up-next deque before finding a valid song. |
+| `back()` | O(h) worst case | May pop multiple invalid entries from history before finding a valid song. |
+| `showHistory()` | O(h) | Traverses the history stack to collect song titles. |
+| `removeSong()` | O(1) average | Finds the node using a HashMap and removes it from the doubly linked list without searching. |
+
+### Variables
+
+- `n` = number of songs in the playlist.
+- `q` = number of entries in the up-next deque.
+- `h` = number of entries in the history stack.
+
+**Note:** HashMap operations take O(1) time on average. The `next()` and `back()` methods may take longer when skipping entries for songs that have been removed.
